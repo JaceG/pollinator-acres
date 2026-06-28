@@ -56,13 +56,13 @@ export function About() {
           <FadeIn delay={100}>
             <div className="space-y-6">
               <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "1.1rem", lineHeight: 1.8, color: "#3D2B0F" }}>
-                Pollinator Acres is a small farm nestled near Delaware, Ohio. We grow cut flowers, raise chickens and ducks, and keep bees — with an unwavering belief that caring for the land means caring for all the life on it.
+                Pollinator Acres is a small farm nestled just outside of city limits in Delaware, Ohio. We grow cut flowers, veggies and herbs. We are also the forever home for a variety of hens and a turkey.
               </p>
               <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "1.1rem", lineHeight: 1.8, color: "#3D2B0F" }}>
-                Every sunflower and zinnia is grown with intention — not just for a beautiful bouquet, but to create habitat and forage for monarchs, native bees, and hundreds of other pollinators that visit our fields each season.
+                Every sunflower and zinnia is grown with intention — not just for a vase on your table, but to create habitat for monarchs, honeybees, and hundreds of other pollinators that visit our fields each season.
               </p>
               <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "1.1rem", lineHeight: 1.8, color: "#3D2B0F" }}>
-                Our chickens and ducks are farm residents, not livestock. They roam, forage, and live good lives here. The eggs they lay are a natural gift — gathered gently and shared with neighbors who appreciate where they come from.
+                Our birds are farm residents, not livestock. They roam, forage, and live good lives here. The eggs they lay are a natural gift — gathered gently and shared with neighbors who appreciate where they come from.
               </p>
               <div className="flex items-center gap-6 pt-2 flex-wrap">
                 {[
@@ -91,14 +91,6 @@ export function About() {
                 className="w-full rounded-2xl object-cover shadow-xl"
                 style={{ height: 420 }}
               />
-              <div
-                className="absolute -bottom-5 -left-5 px-5 py-4 rounded-xl shadow-lg"
-                style={{ backgroundColor: "#E8A020" }}
-              >
-                <p style={{ fontFamily: "'Playfair Display', serif", color: "#FFF", fontSize: "1rem", fontStyle: "italic" }}>
-                  "Grown with care,<br />shared with love."
-                </p>
-              </div>
             </div>
           </FadeIn>
         </div>
@@ -122,13 +114,13 @@ export function About() {
                 The Mission
               </p>
               <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 3.5vw, 2.2rem)", fontWeight: 600, color: "#1C1C1C", lineHeight: 1.3 }}>
-                Growing a Haven for Pollinators
+                Living closer to nature &amp; learning as we go
               </h3>
               <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "1rem", lineHeight: 1.8, color: "#3D2B0F" }}>
-                Monarch butterflies, native bees, swallowtails, hoverflies — we plant for all of them. Our meadow strategy means less mowing, more blooming, and a living landscape that shifts and surprises us season after season.
+              We are growing a haven for pollinators. Monarch butterflies, honeybees, swallowtails, hoverflies — we plant for all of them. Our meadow strategy means less mowing, more blooming, and a living landscape that shifts and surprises us season after season.
               </p>
               <p style={{ fontFamily: "'Lato', sans-serif", fontWeight: 400, fontSize: "1rem", lineHeight: 1.8, color: "#3D2B0F" }}>
-                When you pick up a jar of flowers or a dozen eggs, you're part of that story — supporting a farm that believes good things grow when you give life room to thrive.
+                When you pick up a handful of fresh-cut stems or a dozen eggs, you're part of that story — supporting a farm that believes good things grow when you give life room to thrive.
               </p>
             </div>
           </FadeIn>

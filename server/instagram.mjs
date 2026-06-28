@@ -6,11 +6,48 @@ import {
 
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const POST_LIMIT = 12;
+const MEDIA_FETCH_LIMIT = 25;
+const MAX_MEDIA_PAGES = 4;
+const FRESHCUT_HASHTAG = "freshcut";
+const FRESHEGGS_HASHTAG = "fresheggs";
+const FLOCK_HASHTAG = "flock";
 
-let cache = { posts: null, expiresAt: 0 };
+let cache = { posts: null, freshcut: null, fresheggs: null, flock: null, expiresAt: 0 };
 
 export function clearInstagramCache() {
-  cache = { posts: null, expiresAt: 0 };
+  cache = { posts: null, freshcut: null, fresheggs: null, flock: null, expiresAt: 0 };
+}
+
+function captionHasHashtag(caption, tag) {
+  const normalized = tag.toLowerCase().replace(/^#/, "");
+  return new RegExp(`#${normalized}\\b`, "i").test(caption ?? "");
+}
+
+function mapRawPost(post) {
+  const src = imageUrlForPost(post);
+  if (!src) return null;
+
+  const caption = post.caption ?? "";
+  return {
+    id: post.id,
+    src,
+    alt: caption.slice(0, 120) || "Instagram post from Pollinator Acres",
+    caption,
+    likes: post.like_count ?? 0,
+    comments: post.comments_count ?? 0,
+    permalink: post.permalink,
+    timestamp: post.timestamp ?? null,
+  };
+}
+
+function findLatestHashtagPost(posts, hashtag) {
+  return posts
+    .filter((post) => captionHasHashtag(post.caption, hashtag))
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0] ?? null;
+}
+
+function toFeaturedImage(post) {
+  return post ? { src: post.src, alt: post.alt } : null;
 }
 
 function imageUrlForPost(post) {
@@ -18,7 +55,7 @@ function imageUrlForPost(post) {
   return post.media_url;
 }
 
-async function requestInstagramPosts(token) {
+async function requestInstagramMedia(token, { limit = MEDIA_FETCH_LIMIT, after } = {}) {
   const fields = [
     "id",
     "caption",
@@ -31,8 +68,36 @@ async function requestInstagramPosts(token) {
     "media_type",
   ].join(",");
 
-  const url = `https://graph.instagram.com/me/media?fields=${fields}&limit=${POST_LIMIT}&access_token=${encodeURIComponent(token)}`;
+  const params = new URLSearchParams({
+    fields,
+    limit: String(limit),
+    access_token: token,
+  });
+  if (after) params.set("after", after);
+
+  const url = `https://graph.instagram.com/me/media?${params}`;
   return fetch(url);
+}
+
+async function fetchAllInstagramMedia(token) {
+  const rawPosts = [];
+  let after;
+
+  for (let page = 0; page < MAX_MEDIA_PAGES; page++) {
+    const response = await requestInstagramMedia(token, { after });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Instagram API error (${response.status}): ${body}`);
+    }
+
+    const payload = await response.json();
+    rawPosts.push(...(payload.data ?? []));
+
+    after = payload.paging?.cursors?.after;
+    if (!after) break;
+  }
+
+  return rawPosts;
 }
 
 export async function fetchInstagramPosts() {
@@ -42,46 +107,35 @@ export async function fetchInstagramPosts() {
 
   const now = Date.now();
   if (cache.posts && now < cache.expiresAt) {
-    return cache.posts;
+    return { posts: cache.posts, freshcut: cache.freshcut, fresheggs: cache.fresheggs, flock: cache.flock };
   }
 
   await ensureFreshAccessToken();
   let token = getAccessToken();
-  let response = await requestInstagramPosts(token);
+  let rawPosts;
 
-  if (response.status === 401 || response.status === 400) {
+  try {
+    rawPosts = await fetchAllInstagramMedia(token);
+  } catch (error) {
+    if (!String(error.message).includes("Instagram API error (401)") &&
+        !String(error.message).includes("Instagram API error (400)")) {
+      throw error;
+    }
+
     await refreshAccessToken(token);
     clearInstagramCache();
     token = getAccessToken();
-    response = await requestInstagramPosts(token);
+    rawPosts = await fetchAllInstagramMedia(token);
   }
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Instagram API error (${response.status}): ${body}`);
-  }
+  const mappedPosts = rawPosts.map(mapRawPost).filter(Boolean);
+  const posts = mappedPosts.slice(0, POST_LIMIT);
+  const freshcut = toFeaturedImage(findLatestHashtagPost(mappedPosts, FRESHCUT_HASHTAG));
+  const fresheggs = toFeaturedImage(findLatestHashtagPost(mappedPosts, FRESHEGGS_HASHTAG));
+  const flock = toFeaturedImage(findLatestHashtagPost(mappedPosts, FLOCK_HASHTAG));
 
-  const payload = await response.json();
-  const posts = (payload.data ?? [])
-    .map((post) => {
-      const src = imageUrlForPost(post);
-      if (!src) return null;
-
-      const caption = post.caption ?? "";
-      return {
-        id: post.id,
-        src,
-        alt: caption.slice(0, 120) || "Instagram post from Pollinator Acres",
-        caption,
-        likes: post.like_count ?? 0,
-        comments: post.comments_count ?? 0,
-        permalink: post.permalink,
-      };
-    })
-    .filter(Boolean);
-
-  cache = { posts, expiresAt: now + CACHE_TTL_MS };
-  return posts;
+  cache = { posts, freshcut, fresheggs, flock, expiresAt: now + CACHE_TTL_MS };
+  return { posts, freshcut, fresheggs, flock };
 }
 
 export function instagramApiMiddleware(req, res) {
@@ -92,10 +146,10 @@ export function instagramApiMiddleware(req, res) {
   }
 
   fetchInstagramPosts()
-    .then((posts) => {
+    .then(({ posts, freshcut, fresheggs, flock }) => {
       res.setHeader("Content-Type", "application/json");
       res.setHeader("Cache-Control", "public, max-age=300");
-      res.end(JSON.stringify({ posts }));
+      res.end(JSON.stringify({ posts, freshcut, fresheggs, flock }));
     })
     .catch((error) => {
       console.error("Instagram feed error:", error.message);

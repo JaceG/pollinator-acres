@@ -10,9 +10,9 @@ import img8 from "../../imports/471286839_541235565580154_443679304919461019_n.j
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 const photos = [
-  { src: img1, alt: "Fresh cut flowers in mason jars with a price sign", span: "col-span-2" },
+  { src: img1, alt: "Fresh-cut flower stems with a price sign at the farm stand", span: "col-span-2" },
   { src: img2, alt: "Tall sunflower growing at Pollinator Acres", span: "" },
-  { src: img3, alt: "Colorful pastured eggs in a wire basket", span: "" },
+  { src: img3, alt: "Colorful farm fresh eggs in a wire basket", span: "" },
   { src: img4, alt: "Chickens in the coop", span: "" },
   { src: img5, alt: "Beekeeper holding honeycomb covered in bees", span: "" },
   { src: img6, alt: "Colorful flowers and summer squash", span: "col-span-2" },

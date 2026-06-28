@@ -69,7 +69,7 @@ export function Hero() {
             marginBottom: "2rem",
           }}
         >
-          Fresh flowers, farm eggs &amp; a haven for every pollinator
+          Living closer to nature &amp; learning as we go
         </p>
 
         <p
@@ -83,7 +83,7 @@ export function Hero() {
             marginBottom: "2.5rem",
           }}
         >
-          Near Delaware, OH · West of 42 / S Section Line Rd
+          Delaware, OH
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">

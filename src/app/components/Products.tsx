@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import flowersImg from "../../imports/521972797_17972773484913209_8124882467985080564_n.jpg";
+import img6 from "../../imports/471273554_541228838914160_3640666498425958693_n.jpg";
 import eggsImg from "../../imports/470137550_534417092928668_1895397030731147054_n.jpg";
-import duckImg from "../../imports/491446112_17963453975913209_8717655448177418295_n__1_.jpg";
+import flockDefaultImg from "../../imports/652795802_18074257802564293_8519314114867909914_n.jpg";
+import { MESSAGE_OPTIONS } from "../constants/social";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -34,7 +35,6 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 interface ProductCardProps {
   image: string;
   imageAlt: string;
-  tag: string;
   title: string;
   description: string;
   items: { label: string; price: string }[];
@@ -42,14 +42,35 @@ interface ProductCardProps {
   delay?: number;
   ctaLabel?: string;
   ctaTarget?: string;
+  messageOptions?: readonly { label: string; href: string }[];
+  imageReferrerPolicy?: React.ImgHTMLAttributes<HTMLImageElement>["referrerPolicy"];
 }
 
 function ProductCard({
-  image, imageAlt, tag, title, description, items, note, delay = 0, ctaLabel = "Reserve Yours", ctaTarget = "#signup",
+  image, imageAlt, title, description, items, note, delay = 0, ctaLabel = "Reserve Yours", ctaTarget = "#signup",
+  messageOptions,
+  imageReferrerPolicy,
 }: ProductCardProps) {
+  const [showMessageOptions, setShowMessageOptions] = useState(false);
+
   const handleCta = () => {
+    if (messageOptions?.length) {
+      setShowMessageOptions(true);
+      return;
+    }
+
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelector(ctaTarget)?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  };
+
+  const ctaButtonStyle = {
+    fontFamily: "'Lato', sans-serif",
+    fontWeight: 700,
+    fontSize: "0.8rem",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase" as const,
+    borderColor: "#E8A020",
+    color: "#E8A020",
   };
 
   return (
@@ -65,25 +86,9 @@ function ProductCard({
           <ImageWithFallback
             src={image}
             alt={imageAlt}
+            referrerPolicy={imageReferrerPolicy}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
-          <div
-            className="absolute top-4 left-4 px-3 py-1 rounded-full"
-            style={{ backgroundColor: "#E8A020" }}
-          >
-            <span
-              style={{
-                fontFamily: "'Lato', sans-serif",
-                fontWeight: 700,
-                fontSize: "0.65rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#FFF",
-              }}
-            >
-              {tag}
-            </span>
-          </div>
         </div>
 
         <div className="p-7 flex flex-col flex-1">
@@ -118,7 +123,7 @@ function ProductCard({
                 <span style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.9rem", color: "#3D2B0F" }}>
                   {item.label}
                 </span>
-                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "#E8A020", fontWeight: 700 }}>
+                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "0.95rem", color: "#E8A020", fontWeight: 700, textAlign: "right" }}>
                   {item.price}
                 </span>
               </div>
@@ -131,28 +136,101 @@ function ProductCard({
             </p>
           )}
 
-          <button
-            onClick={handleCta}
-            className="mt-5 w-full py-3 rounded-full border-2 transition-all duration-200 hover:bg-amber-50"
-            style={{
-              fontFamily: "'Lato', sans-serif",
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              borderColor: "#E8A020",
-              color: "#E8A020",
-            }}
-          >
-            {ctaLabel}
-          </button>
+          {showMessageOptions && messageOptions ? (
+            <div className="mt-5 grid gap-2">
+              {messageOptions.map((option) => (
+                <a
+                  key={option.href}
+                  href={option.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 rounded-full border-2 text-center transition-all duration-200 hover:bg-amber-50"
+                  style={ctaButtonStyle}
+                >
+                  {option.label}
+                </a>
+              ))}
+            </div>
+          ) : (
+            <button
+              onClick={handleCta}
+              className="mt-5 w-full py-3 rounded-full border-2 transition-all duration-200 hover:bg-amber-50"
+              style={ctaButtonStyle}
+              aria-expanded={messageOptions ? showMessageOptions : undefined}
+            >
+              {ctaLabel}
+            </button>
+          )}
         </div>
       </div>
     </FadeIn>
   );
 }
 
+interface ProductImage {
+  src: string;
+  alt: string;
+  fromInstagram: boolean;
+}
+
+function instagramImage(
+  data: { src?: string; alt?: string } | null | undefined,
+  fallback: ProductImage,
+  fallbackAlt: string,
+): ProductImage {
+  if (!data?.src) return fallback;
+  return {
+    src: data.src,
+    alt: data.alt || fallbackAlt,
+    fromInstagram: true,
+  };
+}
+
 export function Products() {
+  const [stemImage, setStemImage] = useState<ProductImage>({
+    src: img6,
+    alt: "Fresh-cut flower stems — sunflowers, zinnias, and seasonal blooms from the field",
+    fromInstagram: false,
+  });
+  const [eggImage, setEggImage] = useState<ProductImage>({
+    src: eggsImg,
+    alt: "Colorful farm fresh eggs — brown, sage, pink, and cream — in a wire basket",
+    fromInstagram: false,
+  });
+  const [flockImage, setFlockImage] = useState<ProductImage>({
+    src: flockDefaultImg,
+    alt: "Hens and farm residents at Pollinator Acres",
+    fromInstagram: false,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProductPhotos() {
+      try {
+        const response = await fetch("/api/instagram");
+        const data = await response.json();
+
+        if (cancelled || !response.ok) return;
+
+        setStemImage((current) =>
+          instagramImage(data.freshcut, current, "Latest fresh-cut stems from Pollinator Acres"),
+        );
+        setEggImage((current) =>
+          instagramImage(data.fresheggs, current, "Latest farm fresh eggs from Pollinator Acres"),
+        );
+        setFlockImage((current) =>
+          instagramImage(data.flock, current, "Latest flock photos from Pollinator Acres"),
+        );
+      } catch {
+        // Keep the static fallback images.
+      }
+    }
+
+    loadProductPhotos();
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <section
       id="products"
@@ -177,41 +255,40 @@ export function Products() {
 
         <div className="grid md:grid-cols-3 gap-8">
           <ProductCard
-            image={flowersImg}
-            imageAlt="Fresh cut flower bouquets in mason jars — sunflowers, zinnias, echinacea"
-            tag="Cut Flowers"
-            title="Fresh-Cut Bouquets"
-            description="Seasonal cut flowers bursting with color — sunflowers, zinnias, echinacea, and more. Arranged in mason jars or by the stem. Varieties change weekly as the season unfolds."
+            image={stemImage.src}
+            imageAlt={stemImage.alt}
+            imageReferrerPolicy={stemImage.fromInstagram ? "no-referrer" : undefined}
+            title="Fresh-Cut Stems"
+            description="Hand-cut stems straight from the field — sunflowers, zinnias, wildflowers, and whatever is blooming that week. Pick individual stems or grab a prearranged jar ready for pickup. Varieties rotate as the season unfolds."
             items={[
-              { label: "Jar Bouquet", price: "$10" },
-              { label: "Single Stem", price: "$1" },
+              { label: "Per Stem", price: "Starting at $1" },
+              { label: "Prearranged Jar", price: "Starting at $5" },
             ]}
-            note="Varieties change with the season"
+            note="Mix and match stems or take a jar — varieties change weekly"
             delay={100}
             ctaLabel="Join the List"
             ctaTarget="#signup"
           />
           <ProductCard
-            image={eggsImg}
-            imageAlt="Colorful pastured eggs — blue, pink, tan — in a wire basket"
-            tag="Farm Eggs"
-            title="Pastured Eggs"
-            description="Our hens and ducks live happy, free lives on the farm. They lay eggs in beautiful shades of blue, sage, pink, and cream — with rich, golden yolks that speak for themselves."
+            image={eggImage.src}
+            imageAlt={eggImage.alt}
+            imageReferrerPolicy={eggImage.fromInstagram ? "no-referrer" : undefined}
+            title="Farm Fresh Eggs"
+            description="Our hens live happy, free lives on the farm. They lay eggs in beautiful shades of brown, sage, pink, and cream — with rich, golden yolks that speak for themselves."
             items={[
-              { label: "Chicken Eggs", price: "$5/dz" },
-              { label: "Duck Eggs", price: "$5/dz" },
+              { label: "Farm Fresh Eggs", price: "Starting at $5/dz" },
             ]}
-            note="Washed and ready for pickup near 42 / S Section Line Rd"
+            note="Unwashed and ready for pickup near 42 / S Section Line Rd"
             delay={200}
             ctaLabel="Join the List"
             ctaTarget="#signup"
           />
           <ProductCard
-            image={duckImg}
-            imageAlt="Ducks roaming freely at Pollinator Acres farm"
-            tag="Come Visit"
+            image={flockImage.src}
+            imageAlt={flockImage.alt}
+            imageReferrerPolicy={flockImage.fromInstagram ? "no-referrer" : undefined}
             title="Meet the Flock"
-            description="Our chickens, ducks, and farm residents are a beloved part of life here. Come for the eggs and flowers — stay to say hello to the flock. A little farm magic is good for the soul."
+            description="Our hens and farm residents are a beloved part of life here. Come for the eggs and fresh-cut stems — stay to say hello to the flock. A little farm magic is good for the soul."
             items={[
               { label: "Pickup visits", price: "Always welcome" },
               { label: "Farm experience", price: "Come say hi" },
@@ -219,7 +296,7 @@ export function Products() {
             note="Message us to arrange a visit"
             delay={300}
             ctaLabel="Get in Touch"
-            ctaTarget="#find-us"
+            messageOptions={MESSAGE_OPTIONS}
           />
         </div>
 
@@ -233,7 +310,7 @@ export function Products() {
               Don't Miss Out — Join Our List
             </h3>
             <p style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.95rem", color: "rgba(250,247,240,0.8)", marginBottom: "1.75rem", maxWidth: 500, margin: "0 auto 1.75rem", lineHeight: 1.7 }}>
-              We send quick updates when flowers and eggs are available, so you're never left guessing. Sign up for email or text — or both.
+              We send quick updates when fresh-cut stems and eggs are available, so you're never left guessing. Sign up for email or text — or both.
             </p>
             <button
               onClick={() => {

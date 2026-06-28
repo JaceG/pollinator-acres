@@ -44,7 +44,7 @@ export function Footer() {
                 lineHeight: 1.7,
               }}
             >
-              A small farm near Delaware, Ohio — growing flowers, raising hens &amp; ducks, keeping bees, and nurturing every pollinator in between.
+              A small farm near Delaware, Ohio — growing flowers, raising hens, and learning as we go.
             </p>
           </div>
 
@@ -104,10 +104,9 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { label: "Flower Jar Bouquet", price: "$10" },
-                { label: "Single Stem", price: "$1" },
-                { label: "Chicken Eggs", price: "$5/dz" },
-                { label: "Duck Eggs", price: "$5/dz" },
+                { label: "Fresh-Cut Stem", price: "Starting at $1" },
+                { label: "Prearranged Jar", price: "Starting at $5" },
+                { label: "Farm Fresh Eggs", price: "Starting at $5/dz" },
               ].map((item) => (
                 <li key={item.label} className="flex justify-between">
                   <span

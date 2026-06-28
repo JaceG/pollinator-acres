@@ -190,8 +190,8 @@ export function FindUs() {
                       lineHeight: 1.6,
                     }}
                   >
-                    Jar bouquets — <strong>$10</strong> &nbsp;·&nbsp; Single stems — <strong>$1</strong><br />
-                    Varieties change weekly with the season.
+                    Fresh-cut stems — starting at <strong>$1 each</strong> &nbsp;·&nbsp; Prearranged jars — starting at <strong>$5</strong><br />
+                    Mix and match or grab a jar for pickup — varieties change weekly with the season.
                   </p>
                 </div>
               </div>
@@ -228,8 +228,8 @@ export function FindUs() {
                       lineHeight: 1.6,
                     }}
                   >
-                    Chicken or Duck eggs — <strong>$5/dozen</strong><br />
-                    Washed and ready for pickup.
+                    Farm fresh eggs from our hens — starting at <strong>$5/dozen</strong><br />
+                    Unwashed and ready for pickup.
                   </p>
                 </div>
               </div>
@@ -328,24 +328,6 @@ export function FindUs() {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={300}>
-              <div
-                className="p-5 rounded-xl text-center"
-                style={{ backgroundColor: "#F0E8D8", border: "1px dashed #D4A96A" }}
-              >
-                <p
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: "0.95rem",
-                    fontStyle: "italic",
-                    color: "#5C3D1E",
-                  }}
-                >
-                  "Thank you for supporting our small farm and the pollinators we love. Every purchase helps us grow."
-                </p>
               </div>
             </FadeIn>
           </div>
