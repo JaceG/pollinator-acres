@@ -12,12 +12,17 @@ services:
         sync: false
       - key: INSTAGRAM_ACCESS_TOKEN
         sync: false
+      - key: RENDER_API_KEY
+        sync: false
+      - key: RENDER_SERVICE_ID
+        sync: false
       - key: CRON_SECRET
         generateValue: true
 
   - type: cron
     name: instagram-token-refresh
     runtime: node
+    plan: starter
     schedule: "0 6 1 * *"
     buildCommand: npm ci
     startCommand: npm run refresh-instagram-token
