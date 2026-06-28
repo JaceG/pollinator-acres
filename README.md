@@ -86,7 +86,9 @@ BREVO_API_KEY=your_brevo_api_key
 BREVO_LIST_ID=2
 ```
 
-**Setup steps:**
+**Setup steps:** See **[docs/signup-list-setup.md](docs/signup-list-setup.md)** for a full beginner-friendly walkthrough.
+
+Quick version:
 1. Create a Supabase project and run `supabase/migrations/001_subscribers.sql`
 2. Create a Brevo list and add a `PREFERENCES` contact attribute
 3. Set env vars locally and on Render
