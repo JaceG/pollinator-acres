@@ -5,7 +5,6 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 const navLinks = [
   { label: "About", href: "#about" },
   { label: "What We Offer", href: "#products" },
-  { label: "Updates", href: "#news" },
   { label: "Instagram", href: "#instagram" },
   { label: "Find Us", href: "#find-us" },
 ];
