@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { MapPin, Clock, MessageCircle, Phone, Flower2, Egg } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { MapPin, Clock, MessageCircle, Flower2, Egg } from "lucide-react";
 import produceImg from "../../imports/469276193_17946065156913209_9067507296650311873_n.jpg";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
-function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function FadeIn({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -268,7 +268,7 @@ export function FindUs() {
                 </p>
                 <div className="flex gap-3 flex-wrap">
                   <a
-                    href="https://www.facebook.com"
+                    href="https://www.facebook.com/people/Pollinator-Acres/100090811465945/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 rounded-full border-2 border-white/60 text-white hover:bg-white/15 transition-colors"
@@ -283,7 +283,7 @@ export function FindUs() {
                     Facebook
                   </a>
                   <a
-                    href="https://www.instagram.com"
+                    href="https://www.instagram.com/pollinatoracres/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 rounded-full border-2 border-white/60 text-white hover:bg-white/15 transition-colors"

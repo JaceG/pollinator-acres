@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: pollinator-acres
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: INSTAGRAM_APP_ID
+        sync: false
+      - key: INSTAGRAM_APP_SECRET
+        sync: false
+      - key: INSTAGRAM_ACCESS_TOKEN
+        sync: false
+      - key: CRON_SECRET
+        generateValue: true
+
+  - type: cron
+    name: instagram-token-refresh
+    runtime: node
+    schedule: "0 6 1 * *"
+    buildCommand: npm ci
+    startCommand: npm run refresh-instagram-token
+    envVars:
+      - key: INSTAGRAM_ACCESS_TOKEN
+        sync: false
+      - key: RENDER_API_KEY
+        sync: false
+      - key: RENDER_SERVICE_ID
+        sync: false
+      - key: RENDER_CRON_SERVICE_ID
+        sync: false

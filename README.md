@@ -83,17 +83,30 @@ The signup form requires a backend API endpoint. Set `VITE_FORM_API_URL` in your
 
 ### Instagram Feed
 
-To show live Instagram posts:
+Live posts are fetched from the Instagram Graph API via `/api/instagram`. Add these to `.env`:
 
-1. Set up Instagram Basic Display API
-2. Get your access token and user ID
-3. Add to `.env.local`:
-   ```
-   VITE_INSTAGRAM_ACCESS_TOKEN=your_token
-   VITE_INSTAGRAM_USER_ID=your_user_id
-   ```
+```
+INSTAGRAM_APP_ID=your_app_id
+INSTAGRAM_APP_SECRET=your_app_secret
+INSTAGRAM_ACCESS_TOKEN=your_long_lived_token
+```
 
-See [Instagram API docs](https://developers.facebook.com/docs/instagram-basic-display-api/) for setup instructions.
+Setup guide: [Instagram API with Instagram Login](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login/)
+
+For production, run `npm run build && npm start` so the Node server can proxy Instagram requests.
+
+### Render deployment
+
+`render.yaml` defines:
+- **pollinator-acres** — web service (`npm run build` + `npm start`)
+- **instagram-token-refresh** — cron job on the 1st of each month (6:00 UTC) to refresh the long-lived token
+
+After the first Blueprint deploy, set these in the Render dashboard:
+1. `RENDER_API_KEY` — from Account Settings → API Keys
+2. `RENDER_SERVICE_ID` — web service ID (`srv_...`)
+3. `RENDER_CRON_SERVICE_ID` — cron service ID (`srv_...`)
+
+The cron job refreshes the token and updates both services via the Render API, then triggers a web redeploy.
 
 ## Deployment
 
@@ -161,8 +174,8 @@ pollinator-acres/
 ## Contact
 
 - Email: [contact via website]
-- Instagram: [@pollinatoracres](https://instagram.com/pollinatoracres)
-- Facebook: [Pollinator Acres](https://facebook.com/pollinatoracres)
+- Instagram: [@pollinatoracres](https://www.instagram.com/pollinatoracres/)
+- Facebook: [Pollinator Acres](https://www.facebook.com/people/Pollinator-Acres/100090811465945/)
 
 ---
 
