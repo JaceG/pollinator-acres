@@ -72,14 +72,27 @@ npm run preview
 
 ## Configuration
 
-### Form Submission
+### Signup (Supabase + Brevo)
 
-The signup form requires a backend API endpoint. Set `VITE_FORM_API_URL` in your `.env.local` file.
+Website signups post to `/api/signup`, which:
+1. Saves the subscriber to **Supabase** (database for the future mobile app)
+2. Syncs the contact to **Brevo** (where non-technical operators manage the list and send blasts)
 
-**Recommended services:**
-- [Formspree](https://formspree.io) - Easiest setup, free tier available
-- [EmailJS](https://www.emailjs.com) - Send emails from JavaScript
-- Custom backend (Node.js, Python, etc.)
+Required environment variables (see `.env.example`):
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+BREVO_API_KEY=your_brevo_api_key
+BREVO_LIST_ID=2
+```
+
+**Setup steps:**
+1. Create a Supabase project and run `supabase/migrations/001_subscribers.sql`
+2. Create a Brevo list and add a `PREFERENCES` contact attribute
+3. Set env vars locally and on Render
+4. Import existing contacts: `npm run import-subscribers -- contacts.csv`
+
+For local dev, `npm run dev` proxies `/api/signup` through the same server modules as production.
 
 ### Instagram Feed
 

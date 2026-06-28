@@ -34,9 +34,7 @@ export function SignupSection() {
     setLoading(true);
     
     try {
-      // Replace this URL with your actual backend API endpoint or email service
-      // Examples: Mailchimp API, SendGrid, custom backend, or services like Formspree/EmailJS
-      const apiEndpoint = import.meta.env.VITE_FORM_API_URL || '/api/signup';
+      const apiEndpoint = import.meta.env.VITE_FORM_API_URL || "/api/signup";
       
       const response = await fetch(apiEndpoint, {
         method: 'POST',
@@ -53,7 +51,8 @@ export function SignupSection() {
       });
 
       if (!response.ok) {
-        throw new Error('Signup failed');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(typeof data.error === "string" ? data.error : "Signup failed");
       }
 
       setLoading(false);
@@ -69,7 +68,7 @@ export function SignupSection() {
     } catch (error) {
       console.error('Signup error:', error);
       setLoading(false);
-      alert('Sorry, there was an error signing you up. Please try again or contact us directly.');
+      alert(error instanceof Error ? error.message : "Sorry, there was an error signing you up. Please try again or contact us directly.");
     }
   };
 

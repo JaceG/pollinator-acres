@@ -3,6 +3,7 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { instagramApiMiddleware } from './server/instagram.mjs'
+import { signupApiMiddleware } from './server/signup.mjs'
 
 
 function figmaAssetResolver() {
@@ -20,7 +21,11 @@ function figmaAssetResolver() {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   for (const [key, value] of Object.entries(env)) {
-    if (key.startsWith('INSTAGRAM_')) {
+    if (
+      key.startsWith('INSTAGRAM_') ||
+      key.startsWith('SUPABASE_') ||
+      key.startsWith('BREVO_')
+    ) {
       process.env[key] = value
     }
   }
@@ -36,6 +41,7 @@ export default defineConfig(({ mode }) => {
       name: 'instagram-api',
       configureServer(server) {
         server.middlewares.use('/api/instagram', instagramApiMiddleware)
+        server.middlewares.use('/api/signup', signupApiMiddleware)
       },
     },
   ],
