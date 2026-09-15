@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import logo from "../../imports/LOGO.jpg";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { FACEBOOK_PAGE_URL } from "../constants/social";
 
-const navLinks = [
+type NavLink = { label: string; href: string; external?: boolean };
+
+const navLinks: NavLink[] = [
   { label: "About", href: "#about" },
   { label: "What We Offer", href: "#products" },
   { label: "Instagram", href: "#instagram" },
+  { label: "Facebook", href: FACEBOOK_PAGE_URL, external: true },
   { label: "Find Us", href: "#find-us" },
 ];
 
@@ -62,25 +66,40 @@ export function Nav() {
 
         {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <button
-                onClick={() => handleNav(link.href)}
-                className="transition-colors duration-200 focus:outline-none"
-                style={{
-                  fontFamily: "'Lato', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  color: scrolled ? "#5C3D1E" : "#FAF7F0",
-                  textShadow: scrolled ? "none" : "0 1px 4px rgba(0,0,0,0.4)",
-                }}
-              >
-                {link.label}
-              </button>
-            </li>
-          ))}
+          {navLinks.map((link) => {
+            const style = {
+              fontFamily: "'Lato', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase" as const,
+              color: scrolled ? "#5C3D1E" : "#FAF7F0",
+              textShadow: scrolled ? "none" : "0 1px 4px rgba(0,0,0,0.4)",
+            };
+            return (
+              <li key={link.href}>
+                {link.external ? (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-colors duration-200 focus:outline-none"
+                    style={style}
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => handleNav(link.href)}
+                    className="transition-colors duration-200 focus:outline-none"
+                    style={style}
+                  >
+                    {link.label}
+                  </button>
+                )}
+              </li>
+            );
+          })}
           <li>
             <button
               onClick={() => handleNav("#signup")}
@@ -124,24 +143,40 @@ export function Nav() {
           style={{ backgroundColor: "rgba(250, 247, 240, 0.98)" }}
         >
           <ul className="flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <button
-                  onClick={() => handleNav(link.href)}
-                  className="w-full text-left focus:outline-none"
-                  style={{
-                    fontFamily: "'Lato', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "0.9rem",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#5C3D1E",
-                  }}
-                >
-                  {link.label}
-                </button>
-              </li>
-            ))}
+            {navLinks.map((link) => {
+              const style = {
+                fontFamily: "'Lato', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase" as const,
+                color: "#5C3D1E",
+              };
+              return (
+                <li key={link.href}>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left focus:outline-none"
+                      style={style}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => handleNav(link.href)}
+                      className="w-full text-left focus:outline-none"
+                      style={style}
+                    >
+                      {link.label}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
             <li>
               <button
                 onClick={() => handleNav("#find-us")}
