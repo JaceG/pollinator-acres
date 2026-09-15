@@ -88,6 +88,8 @@ BREVO_LIST_ID=2
 
 **Setup steps:** See **[docs/signup-list-setup.md](docs/signup-list-setup.md)** for a full beginner-friendly walkthrough.
 
+**Keeping it alive:** Supabase's free plan pauses idle projects after ~7 days, which breaks signups. `GET /api/health` touches the database, and `.github/workflows/supabase-keepalive.yml` calls it twice a day. If signups fail with "Unable to save signup", restore the project in the Supabase dashboard. Details in Part 7 of the setup doc.
+
 Quick version:
 1. Create a Supabase project and run `supabase/migrations/001_subscribers.sql`
 2. Create a Brevo list and add a `PREFERENCES` contact attribute

@@ -62,8 +62,16 @@ export async function syncSubscriberToBrevo(subscriber) {
   });
 
   if (response.ok) {
-    const payload = await response.json();
-    return { contactId: payload.id ?? null };
+    // Brevo returns 201 + {id} for a new contact, but 204 with an empty body
+    // when updateEnabled updates an existing contact.
+    const text = await response.text();
+    if (!text) return { contactId: null };
+    try {
+      const payload = JSON.parse(text);
+      return { contactId: payload.id ?? null };
+    } catch {
+      return { contactId: null };
+    }
   }
 
   const errorBody = await response.text();

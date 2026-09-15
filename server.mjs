@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { instagramApiMiddleware, clearInstagramCache } from "./server/instagram.mjs";
 import { refreshAccessToken, persistTokenToRender } from "./server/instagram-token.mjs";
 import { signupExpressHandler } from "./server/signup.mjs";
+import { handleHealth } from "./server/health.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json({ limit: "32kb" }));
 
 app.get("/api/instagram", instagramApiMiddleware);
 app.post("/api/signup", signupExpressHandler);
+app.get("/api/health", handleHealth);
 
 app.post("/api/instagram/refresh-token", async (req, res) => {
   const cronSecret = process.env.CRON_SECRET;

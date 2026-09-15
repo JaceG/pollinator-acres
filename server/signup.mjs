@@ -30,6 +30,20 @@ function normalizePhone(value) {
   return null;
 }
 
+const MIN_FILL_TIME_MS = 2500;
+
+/**
+ * Cheap bot filter. Real visitors never fill the hidden "website" field and
+ * take more than a couple of seconds to fill in the form. Bots that trip this
+ * get a fake success so they don't learn what to change.
+ */
+function looksLikeBot(body) {
+  if (typeof body?.website === "string" && body.website.trim() !== "") return true;
+  const elapsed = Number(body?.elapsedMs);
+  if (Number.isFinite(elapsed) && elapsed >= 0 && elapsed < MIN_FILL_TIME_MS) return true;
+  return false;
+}
+
 function parseSignupBody(body) {
   const firstName = body?.firstName?.trim();
   const preferences = body?.preferences;
@@ -144,6 +158,12 @@ export async function handleSignup(req, res) {
       sendJson(res, 400, { error: "Invalid JSON body." });
       return;
     }
+  }
+
+  if (looksLikeBot(body)) {
+    console.warn("Signup rejected as likely bot");
+    sendJson(res, 200, { ok: true });
+    return;
   }
 
   const parsed = parseSignupBody(body);

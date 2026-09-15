@@ -49,3 +49,7 @@ Thumbs.db
 
 # Cursor
 .cursor/
+
+# Local tooling
+.claude/
+supabase/.temp/

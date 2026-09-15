@@ -270,7 +270,61 @@ It happens automatically — no action needed. They appear in both Supabase and 
 
 ---
 
+## Part 7: Keeping it running for free
+
+The signup form depends on two free services, and each has a gotcha that can silently break signups. Here's how to keep both healthy without paying.
+
+### 7.1 Supabase pauses free projects after 7 days of no activity
+
+This is the big one. Supabase's free plan **pauses your database after about a week with no requests**. When that happens the signup form fails for everyone with "Unable to save signup. Please try again." until someone restores the project. A quiet week with no signups is enough to trigger it.
+
+**The fix (already set up in this repo):** the website has a health endpoint at `/api/health` that runs a tiny database query. A GitHub Actions job in `.github/workflows/supabase-keepalive.yml` calls it twice a day, so Supabase never sees the project as idle. GitHub Actions is free for this.
+
+You don't need to do anything for it to work, as long as:
+
+- The code is deployed to Render (the endpoint has to exist on the live site).
+- The GitHub repository stays on GitHub. The schedule runs from there.
+
+**How to check it's working:** on GitHub, open the repo, click **Actions**, then **Supabase keep-alive**. You should see a green run roughly every 12 hours. A red run means the health check failed. Open it to see the response.
+
+> GitHub disables scheduled workflows automatically if the repo has **no commits for 60 days**. If you get an email from GitHub saying the workflow was disabled, open the Actions tab and click **Enable workflow**. Pushing any commit also re-enables it.
+
+**If Supabase pauses anyway:** log in to [https://supabase.com/dashboard](https://supabase.com/dashboard), open the **Pollinator Acres** project, and click **Restore project**. It takes 2 to 5 minutes. Then re-run the keep-alive workflow from the Actions tab (**Run workflow**) to confirm everything is green.
+
+**Paid alternative:** Supabase Pro ($25/month) never pauses. Only worth it if the free plan becomes a hassle.
+
+### 7.2 Brevo blocks requests from unknown IP addresses
+
+Brevo has a security setting called **Authorized IPs**. When it's on, Brevo only accepts API calls from addresses on a list. Your first login address gets added automatically, but the website runs on Render, not on your computer, so Render's addresses must be on the list too. Otherwise signups save to Supabase but never appear in Brevo, and `brevo_sync_error` in Supabase says "unrecognised IP address".
+
+**Current setup:** Render's Ohio outbound ranges are authorized: `74.220.50.0/24` and `74.220.58.0/24`.
+
+**If it breaks again** (for example, Render changes its addresses, or the service moves region):
+
+1. In Render, open the **pollinator-acres** service, click **Connect** (top right), then the **Outbound** tab. Copy the IP ranges listed.
+2. In Brevo, go to **Settings → Security → Authorized IPs**.
+3. Click **Authorize IP addresses**, paste the ranges (comma-separated), and click **Authorize IP addresses**.
+
+Or, simpler: on that same Brevo page, click **Deactivate for API keys** to turn the blocking off entirely. The API key is still secret, so this is a reasonable choice.
+
+> Local development: your laptop's address changes over time, so `npm run dev` may get the same Brevo rejection even though the live site works. That's expected. Signups still save to Supabase locally; only the Brevo sync fails.
+
+### 7.3 Spam signups
+
+Bots do find the form. Signups with gibberish first names like "Nxejvkhq", random Gmail addresses, and fake phone numbers are spam. Two cheap defenses are built in:
+
+- A hidden **honeypot** field. People never see it; bots fill it in.
+- A **time-to-fill** check. Submissions under 2.5 seconds after the page loads are ignored.
+
+Bots that trip either check get a fake "success" so they don't learn what to change. Nothing is saved. If spam still gets through, delete it in Brevo (it flows there) and in Supabase, and consider adding Cloudflare Turnstile (free) as a stronger check.
+
+---
+
 ## Troubleshooting
+
+### "Unable to save signup. Please try again."
+
+The server could not reach Supabase. Nine times out of ten the project is **paused**. See Part 7.1: restore it from the Supabase dashboard and make sure the keep-alive workflow is running.
 
 ### "Signup is not configured yet"
 
@@ -281,6 +335,7 @@ The server can't find `SUPABASE_URL` or `SUPABASE_SERVICE_ROLE_KEY`. Check your 
 1. Check `BREVO_API_KEY` and `BREVO_LIST_ID` are correct
 2. In Supabase, open the subscriber row and look at `brevo_sync_error` for details
 3. Confirm the `PREFERENCES` attribute exists in Brevo (exact spelling, all caps)
+4. If the error mentions an "unrecognised IP address", Brevo is blocking Render. See Part 7.2.
 
 ### "A valid phone number is required"
 

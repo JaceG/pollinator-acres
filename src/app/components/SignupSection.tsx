@@ -28,6 +28,9 @@ export function SignupSection() {
   const [firstName, setFirstName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Bot protection: hidden honeypot field + time-to-fill. See server/signup.mjs.
+  const [website, setWebsite] = useState("");
+  const formStartedAt = useRef(Date.now());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +49,8 @@ export function SignupSection() {
           email: showEmail ? email : undefined,
           phone: showPhone ? phone : undefined,
           preferences: mode,
+          website,
+          elapsedMs: Date.now() - formStartedAt.current,
           timestamp: new Date().toISOString(),
         }),
       });
@@ -119,6 +124,19 @@ export function SignupSection() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Honeypot: hidden from people, filled in by bots */}
+                  <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+                    <label htmlFor="signup-website">Website</label>
+                    <input
+                      id="signup-website"
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </div>
                   <div>
                     <label style={{ fontFamily: "'Lato', sans-serif", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(250,247,240,0.6)", display: "block", marginBottom: "0.4rem" }}>
                       First Name

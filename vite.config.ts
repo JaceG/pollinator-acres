@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { instagramApiMiddleware } from './server/instagram.mjs'
 import { signupApiMiddleware } from './server/signup.mjs'
+import { handleHealth } from './server/health.mjs'
 
 
 function figmaAssetResolver() {
@@ -42,6 +43,7 @@ export default defineConfig(({ mode }) => {
       configureServer(server) {
         server.middlewares.use('/api/instagram', instagramApiMiddleware)
         server.middlewares.use('/api/signup', signupApiMiddleware)
+        server.middlewares.use('/api/health', handleHealth)
       },
     },
   ],
