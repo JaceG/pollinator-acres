@@ -135,9 +135,13 @@ The website saves each person's notification preference (`email`, `text`, or `bo
    SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...your-long-key...
    BREVO_API_KEY=xkeysib-...your-key...
    BREVO_LIST_ID=2
+   SIGNUP_NOTIFY_EMAIL=camille@pollinatoracres.com
    ```
 
    Replace with your actual values. `BREVO_LIST_ID` is just the number — no quotes needed.
+   `SIGNUP_NOTIFY_EMAIL` is who gets an email each time someone new signs up. Brevo only sends
+   from addresses it has verified (**Senders & IP** → **Senders**), so that address must be a
+   verified sender, or set `SIGNUP_NOTIFY_FROM` to one that is.
 
 3. Save the file. **Never commit `.env` to Git** — it's already in `.gitignore`.
 
@@ -223,6 +227,7 @@ Your live site runs on Render. It needs the same four environment variables.
    | `SUPABASE_SERVICE_ROLE_KEY` | Your Supabase service role key |
    | `BREVO_API_KEY` | Your Brevo API key |
    | `BREVO_LIST_ID` | Your Brevo list ID number |
+   | `SIGNUP_NOTIFY_EMAIL` | Who gets a "New signup" email (a verified Brevo sender) |
 
 5. Click **Save Changes**. Render will redeploy automatically.
 
@@ -266,7 +271,9 @@ Your live site runs on Render. It needs the same four environment variables.
 
 ### When someone signs up on the website
 
-It happens automatically — no action needed. They appear in both Supabase and Brevo within seconds.
+It happens automatically — no action needed. They appear in both Supabase and Brevo within seconds,
+and `SIGNUP_NOTIFY_EMAIL` gets a short "New signup" email with their name, email, phone and preference.
+Updates to an existing contact don't send an email.
 
 ---
 

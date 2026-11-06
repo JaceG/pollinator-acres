@@ -104,3 +104,41 @@ export async function syncSubscriberToBrevo(subscriber) {
 
   throw new Error(`Brevo sync failed (${response.status}): ${errorBody}`);
 }
+
+/**
+ * Email the farm when someone new signs up, so nobody has to watch the
+ * Brevo dashboard. Recipient comes from SIGNUP_NOTIFY_EMAIL; sender must be a
+ * verified Brevo sender (SIGNUP_NOTIFY_FROM, defaults to the recipient).
+ */
+export async function notifyNewSignup(subscriber) {
+  const to = process.env.SIGNUP_NOTIFY_EMAIL;
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!to || !apiKey) return;
+
+  const from = process.env.SIGNUP_NOTIFY_FROM || to;
+  const lines = [
+    `Name: ${subscriber.first_name}`,
+    `Email: ${subscriber.email ?? "—"}`,
+    `Phone: ${subscriber.phone ?? "—"}`,
+    `Wants: ${subscriber.preferences}`,
+  ];
+
+  const response = await fetch(`${BREVO_API}/smtp/email`, {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "Pollinator Acres Website", email: from },
+      to: [{ email: to }],
+      subject: `New signup: ${subscriber.first_name}`,
+      textContent: lines.join("\n"),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Brevo notify failed (${response.status}): ${await response.text()}`);
+  }
+}

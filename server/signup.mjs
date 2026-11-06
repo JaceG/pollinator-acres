@@ -1,4 +1,4 @@
-import { syncSubscriberToBrevo, isBrevoConfigured } from "./brevo.mjs";
+import { syncSubscriberToBrevo, isBrevoConfigured, notifyNewSignup } from "./brevo.mjs";
 import { getSupabase, isSupabaseConfigured } from "./supabase.mjs";
 
 const PREFERENCES = new Set(["email", "text", "both"]);
@@ -116,7 +116,7 @@ async function saveSubscriber(subscriber) {
       .single();
 
     if (error) throw new Error(error.message);
-    return data;
+    return { saved: data, isNew: false };
   }
 
   const { data, error } = await supabase
@@ -126,7 +126,7 @@ async function saveSubscriber(subscriber) {
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return { saved: data, isNew: true };
 }
 
 async function markBrevoSync(subscriberId, { contactId, error }) {
@@ -173,7 +173,7 @@ export async function handleSignup(req, res) {
   }
 
   try {
-    const saved = await saveSubscriber(parsed.subscriber);
+    const { saved, isNew } = await saveSubscriber(parsed.subscriber);
 
     if (isBrevoConfigured()) {
       try {
@@ -182,6 +182,12 @@ export async function handleSignup(req, res) {
       } catch (error) {
         console.error("Brevo sync error:", error.message);
         await markBrevoSync(saved.id, { error: error.message });
+      }
+
+      if (isNew) {
+        notifyNewSignup(saved).catch((error) =>
+          console.error("Signup notify error:", error.message),
+        );
       }
     }
 
